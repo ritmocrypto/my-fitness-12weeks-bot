@@ -178,7 +178,7 @@ def main():
     app.add_handler(CommandHandler("today", today))
     app.add_handler(CommandHandler("stats", stats_cmd))
     app.add_handler(CallbackQueryHandler(button))
-    app.job_queue.run_daily(monday_notify, time=time(8, 0, tzinfo=TZ), days=(1,), name="monday")
+    app.job_queue.run_daily(monday_notify, time=time(7, 0, tzinfo=TZ), days=(1,), name="monday")
     app.job_queue.run_daily(sunday_notify, time=time(20, 0, tzinfo=TZ), days=(0,), name="sunday")
     log.info("Bot is running")
     app.run_polling(drop_pending_updates=True)
