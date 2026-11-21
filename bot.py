@@ -16,6 +16,9 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler, filters
 
 logging.basicConfig(level=logging.INFO)
+# HTTP client INFO logs can expose Telegram bot tokens in request URLs.
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 TZ = ZoneInfo("Asia/Dubai")
 GOALS = {"padel": ("🎾 Падел", 4), "run": ("🏃 Бег", 2), "strength": ("💪 Силовые", 3)}
@@ -374,7 +377,13 @@ async def food_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         meal = await ai_estimate(message.caption if is_photo else message.text, image_bytes)
     except Exception as exc:
-        log.warning("Food estimation failed: %s", type(exc).__name__)
+        # Record useful API validation details without leaking credentials.
+        detail = str(exc)
+        for secret in (os.getenv("BOT_TOKEN"), os.getenv("OPENAI_API_KEY")):
+            if secret:
+                detail = detail.replace(secret, "[REDACTED]")
+        detail = re.sub(r"bot[0-9]{6,}:[A-Za-z0-9_-]+", "bot[REDACTED]", detail)
+        log.warning("Food estimation failed (%s): %s", type(exc).__name__, detail[:900])
         await message.reply_text("Не удалось оценить блюдо. Попробуй уточнить порцию или используй /manual. Проверь OPENAI_API_KEY и баланс API, если ошибка повторяется.")
         return
     await show_draft(message, update.effective_chat.id, meal)
