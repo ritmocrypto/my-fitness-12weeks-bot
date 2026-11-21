@@ -169,13 +169,25 @@ def weekly_report(chat_id, w):
 async def stats_for_week(chat_id, w):
     return weekly_report(chat_id, w)
 
-def main():
+async def test_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    w = max(1, min(week_num(), WEEKS))
+    txt, kb = render(chat_id, w)
+    await context.bot.send_message(
+        chat_id,
+        "🧪 ТЕСТ: Новая неделя! Твой план обновлён."
+    )
+    await context.bot.send_message(
+        chat_id, txt, reply_markup=kb
+    )
+    def main():
     if not os.environ.get("BOT_TOKEN") or not os.environ.get("DATABASE_URL"):
         raise RuntimeError("Set BOT_TOKEN and DATABASE_URL in Railway Variables")
     initialize()
     app = Application.builder().token(os.environ["BOT_TOKEN"]).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("today", today))
+    app.add_handler(CommandHandler("testnotify", test_notify))
     app.add_handler(CommandHandler("stats", stats_cmd))
     app.add_handler(CallbackQueryHandler(button))
     app.job_queue.run_daily(monday_notify, time=time(7, 0, tzinfo=TZ), days=(1,), name="monday")
