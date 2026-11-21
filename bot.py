@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 TZ = ZoneInfo("Asia/Dubai")
 GOALS = {"padel": ("🎾 Падел", 4), "run": ("🏃 Бег", 2), "strength": ("💪 Силовые", 3)}
-START_MONDAY = datetime(2026, 11, 16, tzinfo=TZ).date()
+START_MONDAY = datetime(2026, 11, 23, tzinfo=TZ).date()
 WEEKS = 12
 
 def db():
