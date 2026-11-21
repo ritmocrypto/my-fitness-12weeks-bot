@@ -321,7 +321,7 @@ async def ai_estimate(text, image_bytes=None):
               "верни JSON {\"error\":\"Не удалось определить еду\"}. "
               "Верни только JSON объект: description (на русском), calories (ккал), protein, fat, carbs (граммы). "
               "Без пояснений и markdown.")
-    content = [{"type": "input_text", "text": text or "Оцени всю порцию еды на фотографии; укажи допущения по объёму и ингредиентам."}]
+    content = [{"type": "input_text", "text": "Верни результат в формате JSON. " + (text or "Оцени всю порцию еды на фотографии; укажи допущения по объёму и ингредиентам.")}]
     if image_bytes:
         encoded = base64.b64encode(image_bytes).decode("ascii")
         content.append({"type":"input_image", "image_url":f"data:image/jpeg;base64,{encoded}", "detail":"low"})
@@ -384,7 +384,7 @@ async def food_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 detail = detail.replace(secret, "[REDACTED]")
         detail = re.sub(r"bot[0-9]{6,}:[A-Za-z0-9_-]+", "bot[REDACTED]", detail)
         log.warning("Food estimation failed (%s): %s", type(exc).__name__, detail[:900])
-        await message.reply_text("Не удалось оценить блюдо. Попробуй уточнить порцию или используй /manual. Проверь OPENAI_API_KEY и баланс API, если ошибка повторяется.")
+        await message.reply_text("Не удалось оценить блюдо. Проверь Railway Logs или воспользуйся /manual.")
         return
     await show_draft(message, update.effective_chat.id, meal)
 
