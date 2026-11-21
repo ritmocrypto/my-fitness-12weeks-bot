@@ -181,7 +181,7 @@ async def test_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id, txt, reply_markup=kb
     )
     
-    def main():
+def main():
     if not os.environ.get("BOT_TOKEN") or not os.environ.get("DATABASE_URL"):
         raise RuntimeError("Set BOT_TOKEN and DATABASE_URL in Railway Variables")
     initialize()
